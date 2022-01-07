@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">GoogleMapsApiWorkShop</string>
+    <string name="button_continue_text">Continue</string>
+    <string name="permission_description">
+        In order to use this application we need to request location permission from you. If you
+        agree and wish to continue tap on the button below.
+    </string>
+    <string name="welcome">Welcome</string>
+    <string name="permission_required">Permission Required</string>
+    <string name="app_description">With this app you able to add markers by long clicking
+        on the map and app provide you some features like make route on this points, show
+        navigation between these points etc.
+    </string>
 </resources>
