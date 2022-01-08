@@ -1,14 +1,15 @@
 package com.envercelik.googlemapsapiworkshop
 
-import androidx.fragment.app.Fragment
-
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
+import androidx.fragment.app.Fragment
+import com.envercelik.googlemapsapiworkshop.common.Constants.ACTION_SERVICE_START
+import com.envercelik.googlemapsapiworkshop.service.LocationService
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
@@ -16,10 +17,14 @@ import com.google.android.gms.maps.model.MarkerOptions
 
 class MapsFragment : Fragment() {
 
+    @SuppressLint("MissingPermission")
     private val callback = OnMapReadyCallback { googleMap ->
         val sydney = LatLng(-34.0, 151.0)
         googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        googleMap.isMyLocationEnabled = true
+
+        sendActionCommandToLocationService(ACTION_SERVICE_START)
     }
 
     override fun onCreateView(
@@ -34,5 +39,12 @@ class MapsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(callback)
+    }
+
+    private fun sendActionCommandToLocationService(action: String) {
+        Intent(requireContext(), LocationService::class.java).apply {
+            this.action = action
+            requireContext().startService(this)
+        }
     }
 }
