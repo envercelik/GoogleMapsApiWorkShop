@@ -1,4 +1,4 @@
-package com.envercelik.googlemapsapiworkshop
+package com.envercelik.googlemapsapiworkshop.ui.maps
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.envercelik.googlemapsapiworkshop.R
 import com.envercelik.googlemapsapiworkshop.common.Constants.ACTION_SERVICE_START
 import com.envercelik.googlemapsapiworkshop.service.LocationService
 import com.google.android.gms.maps.CameraUpdateFactory

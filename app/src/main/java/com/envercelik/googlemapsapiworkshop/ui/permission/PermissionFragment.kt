@@ -1,4 +1,4 @@
-package com.envercelik.googlemapsapiworkshop
+package com.envercelik.googlemapsapiworkshop.ui.permission
 
 import android.os.Bundle
 import android.view.LayoutInflater

@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/permissionFragment"
-        android:name="com.envercelik.googlemapsapiworkshop.PermissionFragment"
+        android:name="com.envercelik.googlemapsapiworkshop.ui.permission.PermissionFragment"
         android:label="fragment_permission"
         tools:layout="@layout/fragment_permission" >
         <action
@@ -18,7 +18,7 @@
     </fragment>
     <fragment
         android:id="@+id/mapsFragment"
-        android:name="com.envercelik.googlemapsapiworkshop.MapsFragment"
+        android:name="com.envercelik.googlemapsapiworkshop.ui.maps.MapsFragment"
         android:label="fragment_maps"
         tools:layout="@layout/fragment_maps" />
 </navigation>
