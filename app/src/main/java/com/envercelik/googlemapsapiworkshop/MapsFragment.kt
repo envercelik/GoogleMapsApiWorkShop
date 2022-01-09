@@ -10,21 +10,24 @@ import androidx.fragment.app.Fragment
 import com.envercelik.googlemapsapiworkshop.common.Constants.ACTION_SERVICE_START
 import com.envercelik.googlemapsapiworkshop.service.LocationService
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 
 class MapsFragment : Fragment() {
+    private lateinit var map: GoogleMap
 
     @SuppressLint("MissingPermission")
     private val callback = OnMapReadyCallback { googleMap ->
-        val sydney = LatLng(-34.0, 151.0)
-        googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
         googleMap.isMyLocationEnabled = true
+        map = googleMap
 
         sendActionCommandToLocationService(ACTION_SERVICE_START)
+
+        LocationService.lastLocation.observe(this) {
+            moveCamera(it)
+        }
     }
 
     override fun onCreateView(
@@ -46,5 +49,9 @@ class MapsFragment : Fragment() {
             this.action = action
             requireContext().startService(this)
         }
+    }
+
+    private fun moveCamera(latLng: LatLng) {
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
     }
 }

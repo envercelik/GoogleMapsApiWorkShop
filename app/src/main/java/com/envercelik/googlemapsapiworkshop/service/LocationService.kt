@@ -23,6 +23,7 @@ class LocationService : LifecycleService() {
     companion object {
         val isServiceStarted = MutableLiveData<Boolean>()
         val locationList = MutableLiveData<MutableList<LatLng>>()
+        val lastLocation = MutableLiveData<LatLng>()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -31,6 +32,7 @@ class LocationService : LifecycleService() {
                 ACTION_SERVICE_START -> {
                     isServiceStarted.postValue(true)
                     startLocationUpdates()
+                    getLastLocation()
                 }
                 ACTION_SERVICE_STOP -> {
 
@@ -51,6 +53,16 @@ class LocationService : LifecycleService() {
     private fun setInitialValues() {
         isServiceStarted.postValue(false)
         locationList.postValue(mutableListOf())
+    }
+
+    @SuppressLint("MissingPermission")
+    fun getLastLocation() {
+        fusedLocationProviderClient.lastLocation.addOnCompleteListener {
+            if (it.isSuccessful) {
+                val latLng = LatLng(it.result.latitude, it.result.longitude)
+                lastLocation.postValue(latLng)
+            }
+        }
     }
 
     @SuppressLint("MissingPermission")
