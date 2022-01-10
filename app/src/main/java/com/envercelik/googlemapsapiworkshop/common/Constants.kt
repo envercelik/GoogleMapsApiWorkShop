@@ -9,5 +9,5 @@ object Constants {
     const val LOCATION_UPDATE_INTERVAL = 4000L
     const val LOCATION_FASTEST_UPDATE_INTERVAL = 2000L
 
-    const val BASE_URL = "https://maps.googleapis.com/maps/api/directions/json"
+    const val BASE_URL = "https://maps.googleapis.com/maps/"
 }

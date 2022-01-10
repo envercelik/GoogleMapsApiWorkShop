@@ -2,6 +2,8 @@ package com.envercelik.googlemapsapiworkshop.di
 
 import com.envercelik.googlemapsapiworkshop.common.Constants.BASE_URL
 import com.envercelik.googlemapsapiworkshop.data.remote.GoogleDirectionService
+import com.envercelik.googlemapsapiworkshop.data.repository.DirectionRepositoryImpl
+import com.envercelik.googlemapsapiworkshop.domain.repository.DirectionRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,5 +41,11 @@ object AppModule {
     @Singleton
     fun provideGoogleDirectionService(retrofit: Retrofit): GoogleDirectionService {
         return retrofit.create(GoogleDirectionService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDirectionRepository(service: GoogleDirectionService): DirectionRepository {
+        return DirectionRepositoryImpl(service)
     }
 }
