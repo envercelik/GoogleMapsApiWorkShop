@@ -1,5 +1,6 @@
 package com.envercelik.googlemapsapiworkshop.ui.maps
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.envercelik.googlemapsapiworkshop.common.Resource
@@ -12,6 +13,13 @@ import javax.inject.Inject
 class MapsViewModel @Inject constructor(
     private val getDirectionsUseCase: GetDirectionsUseCase
 ) : ViewModel() {
+
+    val isButtonResetMapVisible = MutableLiveData<Boolean>(false)
+    val isButtonShowRoutesVisible = MutableLiveData<Boolean>(true)
+
+    val isButtonStopNavigationVisible = MutableLiveData(false)
+    val isButtonStartNavigationVisible = MutableLiveData(true)
+
     fun getDirection() {
         viewModelScope.launch {
             val result = getDirectionsUseCase(

@@ -11,4 +11,8 @@
         on the map and app provide you some features like make route on this points, show
         navigation between these points etc.
     </string>
+    <string name="show_routes">Show routes</string>
+    <string name="reset_map">reset map</string>
+    <string name="start_navigation">start navigation</string>
+    <string name="stop_navigation">stop navigation</string>
 </resources>
