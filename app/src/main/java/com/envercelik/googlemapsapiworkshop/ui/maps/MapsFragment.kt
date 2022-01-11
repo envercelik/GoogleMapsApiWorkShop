@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.envercelik.googlemapsapiworkshop.R
 import com.envercelik.googlemapsapiworkshop.common.Constants.ACTION_SERVICE_START
+import com.envercelik.googlemapsapiworkshop.common.Constants.ACTION_SERVICE_STOP
 import com.envercelik.googlemapsapiworkshop.databinding.FragmentMapsBinding
 import com.envercelik.googlemapsapiworkshop.service.LocationService
 import com.envercelik.googlemapsapiworkshop.ui.maps.MapsViewModel.MapState
@@ -20,6 +21,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.ButtCap
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.JointType
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
@@ -32,6 +34,7 @@ class MapsFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var map: GoogleMap
     private val viewModel: MapsViewModel by viewModels()
+    private var locationList = mutableListOf<LatLng>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,7 +62,7 @@ class MapsFragment : Fragment() {
         }
 
         viewModel.overviewPolylinePointsOfRoute.observe(viewLifecycleOwner) {
-            drawPolyline(it)
+            drawPolyline(it, Color.BLUE)
         }
 
         viewModel.mapViewState.observe(viewLifecycleOwner) {
@@ -70,7 +73,28 @@ class MapsFragment : Fragment() {
             moveCamera(it)
         }
 
+        binding.buttonStartNavigation.setOnClickListener {
+            onButtonStartNavigationClick(it)
+        }
+
+        binding.buttonStopNavigation.setOnClickListener {
+            onButtonStopNavigationClick(it)
+        }
+    }
+
+    private fun onButtonStartNavigationClick(it: View) {
         sendActionCommandToLocationService(ACTION_SERVICE_START)
+        it.visibility = View.GONE
+        binding.buttonStopNavigation.visibility = View.VISIBLE
+        locationList.clear()
+        observeLocationList()
+    }
+
+    private fun onButtonStopNavigationClick(it: View) {
+        sendActionCommandToLocationService(ACTION_SERVICE_STOP)
+        it.visibility = View.GONE
+        binding.buttonStartNavigation.visibility = View.VISIBLE
+        locationList.clear()
     }
 
     private fun onMapViewStateChange(mapState: MapState) {
@@ -86,19 +110,20 @@ class MapsFragment : Fragment() {
                 map.setOnMapLongClickListener {
                     addMarker(it)
                 }
+                locationList.clear()
             }
         }
     }
 
-    private fun drawPolyline(locationList: List<LatLng>) {
+    private fun drawPolyline(latLngList: List<LatLng> = locationList, color: Int) {
         map.addPolyline(
             PolylineOptions().apply {
                 width(10f)
-                color(Color.BLUE)
+                color(color)
                 jointType(JointType.ROUND)
                 startCap(ButtCap())
                 endCap(ButtCap())
-                addAll(locationList)
+                addAll(latLngList)
             }
         )
     }
@@ -119,6 +144,32 @@ class MapsFragment : Fragment() {
         marker?.let {
             viewModel.markers.add(marker)
         }
+    }
+
+    private fun observeLocationList() {
+        LocationService.locationList.observe(viewLifecycleOwner, {
+            if (it != null) {
+                locationList = it
+                drawPolyline(color = Color.YELLOW)
+                followPolyline()
+            }
+        })
+    }
+
+    private fun followPolyline() {
+        if (locationList.isNotEmpty()) {
+            val lastLocation = locationList.last()
+            val newCameraPosition =
+                CameraUpdateFactory.newCameraPosition(setCameraPosition(lastLocation))
+            map.animateCamera(newCameraPosition, 1000, null)
+        }
+    }
+
+    private fun setCameraPosition(location: LatLng): CameraPosition {
+        return CameraPosition.Builder()
+            .target(location)
+            .zoom(18f)
+            .build()
     }
 
     override fun onDestroyView() {

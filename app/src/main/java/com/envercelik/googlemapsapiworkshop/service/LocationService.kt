@@ -2,6 +2,7 @@ package com.envercelik.googlemapsapiworkshop.service
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.location.Location
 import android.os.Looper
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
@@ -21,7 +22,6 @@ class LocationService : LifecycleService() {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
     companion object {
-        val isServiceStarted = MutableLiveData<Boolean>()
         val locationList = MutableLiveData<MutableList<LatLng>>()
         val lastLocation = MutableLiveData<LatLng>()
     }
@@ -30,14 +30,11 @@ class LocationService : LifecycleService() {
         intent?.let {
             when (it.action) {
                 ACTION_SERVICE_START -> {
-                    isServiceStarted.postValue(true)
                     startLocationUpdates()
                     getLastLocation()
                 }
                 ACTION_SERVICE_STOP -> {
-
-                }
-                else -> {
+                    removeLocationUpdates()
                 }
             }
         }
@@ -50,8 +47,11 @@ class LocationService : LifecycleService() {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
+    private fun removeLocationUpdates() {
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+    }
+
     private fun setInitialValues() {
-        isServiceStarted.postValue(false)
         locationList.postValue(mutableListOf())
     }
 
@@ -83,9 +83,16 @@ class LocationService : LifecycleService() {
         override fun onLocationResult(result: LocationResult) {
             super.onLocationResult(result)
             for (location in result.locations) {
-                val newLetLng = LatLng(location.latitude, location.longitude)
-                println(newLetLng)
+                updateLocationList(location)
             }
+        }
+    }
+
+    private fun updateLocationList(location: Location) {
+        val newLatLng = LatLng(location.latitude, location.longitude)
+        locationList.value?.apply {
+            add(newLatLng)
+            locationList.postValue(this)
         }
     }
 }
