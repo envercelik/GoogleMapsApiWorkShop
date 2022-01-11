@@ -56,8 +56,6 @@ class MapsFragment : Fragment() {
             addMarker(it)
         }
 
-        viewModel.getDirection("Disneyland", "Universal+Studios+Hollywood", "your_api_key")
-
         viewModel.overviewPolylinePointsOfRoute.observe(viewLifecycleOwner) {
             drawPolyline(it)
         }

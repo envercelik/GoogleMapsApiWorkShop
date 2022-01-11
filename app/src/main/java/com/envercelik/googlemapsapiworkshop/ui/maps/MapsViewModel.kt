@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.envercelik.googlemapsapiworkshop.common.Resource
+import com.envercelik.googlemapsapiworkshop.data.remote.model.DirectionResponse
 import com.envercelik.googlemapsapiworkshop.domain.usecase.GetDirectionsUseCase
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
@@ -29,21 +30,45 @@ class MapsViewModel @Inject constructor(
 
     val markers = mutableListOf<Marker>()
 
-    fun getDirection(origin: String, destination: String, key: String) {
+    private fun getDirection(origin: String, destination: String, key: String) {
         viewModelScope.launch {
-            val result = getDirectionsUseCase(
-                origin, destination, key
-            ).collect {
+            getDirectionsUseCase(origin, destination, key).collect {
                 when (it) {
-                    is Resource.Success -> {
-                        val overviewPolylinePointsOfRoute =
-                            it.data!!.routes[0].overviewPolyline.points
-                        val listOfLatLng = PolyUtil.decode(overviewPolylinePointsOfRoute)
-                        _overviewPolylineLocationList.postValue(listOfLatLng)
-                    }
+                    is Resource.Success -> onGetDirectionResponseSuccess(it.data!!)
                     is Resource.Error -> println(it.message)
                 }
             }
         }
+    }
+
+    private fun onGetDirectionResponseSuccess(data: DirectionResponse) {
+        val overviewPolylinePointsOfRoute = data.routes[0].overviewPolyline.points
+        val listOfLatLng = PolyUtil.decode(overviewPolylinePointsOfRoute)
+        _overviewPolylineLocationList.postValue(listOfLatLng)
+    }
+
+    fun onButtonShowRoutesClick() {
+        isButtonShowRoutesVisible.value = false
+        isButtonResetMapVisible.value = true
+
+        val listOfRoutes = markers.toRouteList()
+        println(listOfRoutes)
+        for (route in listOfRoutes) {
+            val startLocation = route.first
+            val endLocation = route.second
+            getDirection(startLocation, endLocation, "your_api_key")
+        }
+    }
+
+    private fun MutableList<Marker>.toRouteList(): List<Pair<String, String>> {
+        val positionList = mutableListOf<String>()
+        for (marker in this) {
+            positionList.add(marker.position.toStringLatLng())
+        }
+        return positionList.zipWithNext()
+    }
+
+    private fun LatLng.toStringLatLng(): String {
+        return "$latitude,$longitude"
     }
 }
