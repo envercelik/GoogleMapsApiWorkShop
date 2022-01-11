@@ -20,6 +20,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.ButtCap
 import com.google.android.gms.maps.model.JointType
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -51,6 +52,9 @@ class MapsFragment : Fragment() {
     private val callback = OnMapReadyCallback { googleMap ->
         map = googleMap
         map.isMyLocationEnabled = true
+        map.setOnMapLongClickListener {
+            addMarker(it)
+        }
 
         viewModel.getDirection("Disneyland", "Universal+Studios+Hollywood", "your_api_key")
 
@@ -87,6 +91,13 @@ class MapsFragment : Fragment() {
 
     private fun moveCamera(latLng: LatLng) {
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+    }
+
+    private fun addMarker(latLng: LatLng) {
+        val marker = map.addMarker(MarkerOptions().position(latLng))
+        marker?.let {
+            viewModel.markers.add(marker)
+        }
     }
 
     override fun onDestroyView() {

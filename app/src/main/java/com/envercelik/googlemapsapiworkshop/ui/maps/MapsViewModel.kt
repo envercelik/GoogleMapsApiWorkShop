@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.envercelik.googlemapsapiworkshop.common.Resource
 import com.envercelik.googlemapsapiworkshop.domain.usecase.GetDirectionsUseCase
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.PolyUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -25,6 +26,8 @@ class MapsViewModel @Inject constructor(
 
     private val _overviewPolylineLocationList = MutableLiveData<List<LatLng>>()
     val overviewPolylinePointsOfRoute: LiveData<List<LatLng>> = _overviewPolylineLocationList
+
+    val markers = mutableListOf<Marker>()
 
     fun getDirection(origin: String, destination: String, key: String) {
         viewModelScope.launch {
