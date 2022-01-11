@@ -7,12 +7,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.envercelik.googlemapsapiworkshop.R
 import com.envercelik.googlemapsapiworkshop.common.Constants.ACTION_SERVICE_START
 import com.envercelik.googlemapsapiworkshop.databinding.FragmentMapsBinding
 import com.envercelik.googlemapsapiworkshop.service.LocationService
+import com.envercelik.googlemapsapiworkshop.ui.maps.MapsViewModel.MapState
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -60,11 +62,32 @@ class MapsFragment : Fragment() {
             drawPolyline(it)
         }
 
+        viewModel.mapViewState.observe(viewLifecycleOwner) {
+            onMapViewStateChange(it)
+        }
+
         LocationService.lastLocation.observe(this) {
             moveCamera(it)
         }
 
         sendActionCommandToLocationService(ACTION_SERVICE_START)
+    }
+
+    private fun onMapViewStateChange(mapState: MapState) {
+        when (mapState) {
+            MapState.NON_DRAWABLE -> {
+                map.setOnMapLongClickListener {
+                    Toast.makeText(requireContext(), "please reset map", Toast.LENGTH_LONG)
+                        .show()
+                }
+            }
+            MapState.DRAWABLE -> {
+                map.clear()
+                map.setOnMapLongClickListener {
+                    addMarker(it)
+                }
+            }
+        }
     }
 
     private fun drawPolyline(locationList: List<LatLng>) {

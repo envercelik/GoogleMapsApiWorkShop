@@ -30,6 +30,9 @@ class MapsViewModel @Inject constructor(
 
     val markers = mutableListOf<Marker>()
 
+    private val _mapViewState = MutableLiveData<MapState>()
+    val mapViewState: LiveData<MapState> = _mapViewState
+
     private fun getDirection(origin: String, destination: String, key: String) {
         viewModelScope.launch {
             getDirectionsUseCase(origin, destination, key).collect {
@@ -48,15 +51,18 @@ class MapsViewModel @Inject constructor(
     }
 
     fun onButtonShowRoutesClick() {
-        isButtonShowRoutesVisible.value = false
-        isButtonResetMapVisible.value = true
+        if (markers.size > 1) {
+            isButtonShowRoutesVisible.value = false
+            isButtonResetMapVisible.value = true
+            _mapViewState.value = MapState.NON_DRAWABLE
 
-        val listOfRoutes = markers.toRouteList()
-        println(listOfRoutes)
-        for (route in listOfRoutes) {
-            val startLocation = route.first
-            val endLocation = route.second
-            getDirection(startLocation, endLocation, "your_api_key")
+            val listOfRoutes = markers.toRouteList()
+
+            for (route in listOfRoutes) {
+                val startLocation = route.first
+                val endLocation = route.second
+                getDirection(startLocation, endLocation, "your_api_key")
+            }
         }
     }
 
@@ -71,4 +77,16 @@ class MapsViewModel @Inject constructor(
     private fun LatLng.toStringLatLng(): String {
         return "$latitude,$longitude"
     }
+
+    fun onButtonResetMapClick() {
+        isButtonResetMapVisible.value = false
+        isButtonShowRoutesVisible.value = true
+        _mapViewState.value = MapState.DRAWABLE
+        markers.clear()
+    }
+
+    enum class MapState {
+        DRAWABLE, NON_DRAWABLE
+    }
 }
+
