@@ -1,10 +1,13 @@
 package com.envercelik.googlemapsapiworkshop.ui.maps
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.envercelik.googlemapsapiworkshop.common.Resource
 import com.envercelik.googlemapsapiworkshop.domain.usecase.GetDirectionsUseCase
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.PolyUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,14 +23,21 @@ class MapsViewModel @Inject constructor(
     val isButtonStopNavigationVisible = MutableLiveData(false)
     val isButtonStartNavigationVisible = MutableLiveData(true)
 
-    fun getDirection() {
+    private val _overviewPolylineLocationList = MutableLiveData<List<LatLng>>()
+    val overviewPolylinePointsOfRoute: LiveData<List<LatLng>> = _overviewPolylineLocationList
+
+    fun getDirection(origin: String, destination: String, key: String) {
         viewModelScope.launch {
             val result = getDirectionsUseCase(
-                "Disneyland", "Universal+Studios+Hollywood",
-                "your_api_key"
+                origin, destination, key
             ).collect {
                 when (it) {
-                    is Resource.Success -> println(it.data!!.routes)
+                    is Resource.Success -> {
+                        val overviewPolylinePointsOfRoute =
+                            it.data!!.routes[0].overviewPolyline.points
+                        val listOfLatLng = PolyUtil.decode(overviewPolylinePointsOfRoute)
+                        _overviewPolylineLocationList.postValue(listOfLatLng)
+                    }
                     is Resource.Error -> println(it.message)
                 }
             }

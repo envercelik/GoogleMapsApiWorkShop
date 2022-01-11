@@ -2,6 +2,7 @@ package com.envercelik.googlemapsapiworkshop.ui.maps
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,7 +17,10 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.ButtCap
+import com.google.android.gms.maps.model.JointType
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.PolylineOptions
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -48,11 +52,30 @@ class MapsFragment : Fragment() {
         map = googleMap
         map.isMyLocationEnabled = true
 
+        viewModel.getDirection("Disneyland", "Universal+Studios+Hollywood", "your_api_key")
+
+        viewModel.overviewPolylinePointsOfRoute.observe(viewLifecycleOwner) {
+            drawPolyline(it)
+        }
+
         LocationService.lastLocation.observe(this) {
             moveCamera(it)
         }
 
         sendActionCommandToLocationService(ACTION_SERVICE_START)
+    }
+
+    private fun drawPolyline(locationList: List<LatLng>) {
+        map.addPolyline(
+            PolylineOptions().apply {
+                width(10f)
+                color(Color.BLUE)
+                jointType(JointType.ROUND)
+                startCap(ButtCap())
+                endCap(ButtCap())
+                addAll(locationList)
+            }
+        )
     }
 
     private fun sendActionCommandToLocationService(action: String) {
