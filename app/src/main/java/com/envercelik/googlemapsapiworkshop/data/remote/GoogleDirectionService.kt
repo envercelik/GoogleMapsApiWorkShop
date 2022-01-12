@@ -9,6 +9,7 @@ interface GoogleDirectionService {
     suspend fun getDirections(
         @Query("origin") origin: String,
         @Query("destination") destination: String,
-        @Query("key") key: String
+        @Query("mode") mode: String,
+        @Query("key") key: String,
     ): DirectionResponse
 }

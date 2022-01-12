@@ -22,6 +22,31 @@
             tools:context=".ui.maps.MapsFragment" />
 
         <Button
+            android:id="@+id/buttonWalkingMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:onClick="@{() -> viewModel.onButtonWalkingModeClick()}"
+            android:text="@string/walking"
+            app:isVisible="@{viewModel.isButtonWalkingModeVisible()}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/buttonDrivingMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:onClick="@{() -> viewModel.onButtonDrivingModeClick()}"
+            android:text="@string/driving"
+            app:isVisible="@{viewModel.isButtonDrivingModeVisible()}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <Button
             android:id="@+id/buttonShowRoutes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

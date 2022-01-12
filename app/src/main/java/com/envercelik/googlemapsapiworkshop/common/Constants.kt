@@ -10,4 +10,7 @@ object Constants {
     const val LOCATION_FASTEST_UPDATE_INTERVAL = 2000L
 
     const val BASE_URL = "https://maps.googleapis.com/maps/"
+
+    const val TRANSPORTATION_MODE_WALKING = "walking"
+    const val TRANSPORTATION_MODE_DRIVING = "driving"
 }

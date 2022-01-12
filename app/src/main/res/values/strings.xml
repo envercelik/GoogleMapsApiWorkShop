@@ -15,4 +15,6 @@
     <string name="reset_map">reset map</string>
     <string name="start_navigation">start navigation</string>
     <string name="stop_navigation">stop navigation</string>
+    <string name="walking">walking</string>
+    <string name="driving">driving</string>
 </resources>

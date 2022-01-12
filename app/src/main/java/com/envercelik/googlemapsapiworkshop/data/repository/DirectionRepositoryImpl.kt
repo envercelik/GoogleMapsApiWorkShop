@@ -9,8 +9,8 @@ class DirectionRepositoryImpl @Inject constructor(
     private val service: GoogleDirectionService
 ) : DirectionRepository {
 
-    override suspend fun getRoutes(origin: String, destination: String, key: String):
+    override suspend fun getRoutes(origin: String, destination: String, mode: String, key: String):
             DirectionResponse {
-        return service.getDirections(origin, destination, key)
+        return service.getDirections(origin, destination, mode, key)
     }
 }

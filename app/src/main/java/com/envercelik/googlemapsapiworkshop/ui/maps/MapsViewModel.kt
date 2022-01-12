@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.envercelik.googlemapsapiworkshop.common.Constants
 import com.envercelik.googlemapsapiworkshop.common.Resource
 import com.envercelik.googlemapsapiworkshop.data.remote.model.DirectionResponse
 import com.envercelik.googlemapsapiworkshop.domain.usecase.GetDirectionsUseCase
@@ -25,17 +26,22 @@ class MapsViewModel @Inject constructor(
     val isButtonStopNavigationVisible = MutableLiveData(false)
     val isButtonStartNavigationVisible = MutableLiveData(true)
 
+    val isButtonWalkingModeVisible = MutableLiveData(true)
+    val isButtonDrivingModeVisible = MutableLiveData(false)
+
     private val _overviewPolylineLocationList = MutableLiveData<List<LatLng>>()
     val overviewPolylinePointsOfRoute: LiveData<List<LatLng>> = _overviewPolylineLocationList
 
     val markers = mutableListOf<Marker>()
 
+    var transportationMode: String = "walking"
+
     private val _mapViewState = MutableLiveData<MapState>()
     val mapViewState: LiveData<MapState> = _mapViewState
 
-    private fun getDirection(origin: String, destination: String, key: String) {
+    private fun getDirection(origin: String, destination: String, mode: String, key: String) {
         viewModelScope.launch {
-            getDirectionsUseCase(origin, destination, key).collect {
+            getDirectionsUseCase(origin, destination, mode, key).collect {
                 when (it) {
                     is Resource.Success -> onGetDirectionResponseSuccess(it.data!!)
                     is Resource.Error -> println(it.message)
@@ -51,6 +57,10 @@ class MapsViewModel @Inject constructor(
     }
 
     fun onButtonShowRoutesClick() {
+        makeDirectionRequest()
+    }
+
+    private fun makeDirectionRequest() {
         if (markers.size > 1) {
             isButtonShowRoutesVisible.value = false
             isButtonResetMapVisible.value = true
@@ -61,9 +71,25 @@ class MapsViewModel @Inject constructor(
             for (route in listOfRoutes) {
                 val startLocation = route.first
                 val endLocation = route.second
-                getDirection(startLocation, endLocation, "your_api_key")
+                getDirection(
+                    startLocation, endLocation, transportationMode,
+                    "your_api_key"
+                )
             }
         }
+    }
+
+
+    fun onButtonWalkingModeClick() {
+        transportationMode = Constants.TRANSPORTATION_MODE_DRIVING
+        isButtonWalkingModeVisible.value = false
+        isButtonDrivingModeVisible.value = true
+    }
+
+    fun onButtonDrivingModeClick() {
+        transportationMode = Constants.TRANSPORTATION_MODE_WALKING
+        isButtonWalkingModeVisible.value = true
+        isButtonDrivingModeVisible.value = false
     }
 
     private fun MutableList<Marker>.toRouteList(): List<Pair<String, String>> {

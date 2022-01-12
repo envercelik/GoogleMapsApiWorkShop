@@ -11,9 +11,9 @@ import javax.inject.Inject
 class GetDirectionsUseCase @Inject constructor(
     private val repository: DirectionRepository
 ) {
-    operator fun invoke(origin: String, destination: String, key: String) = flow {
+    operator fun invoke(origin: String, destination: String, mode: String, key: String) = flow {
         try {
-            val routes = repository.getRoutes(origin, destination, key)
+            val routes = repository.getRoutes(origin, destination, mode, key)
             emit(Resource.Success<DirectionResponse>(routes))
         } catch (e: HttpException) {
             emit(
